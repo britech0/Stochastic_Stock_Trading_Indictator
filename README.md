@@ -13,8 +13,9 @@ This is my custom-made TradingView indicator that combines multiple open-source 
 1. The stochastic indicator (Used as a possible signal to trend changes)
 2. Heikin Ashi bar color changer (Helps identify up and down trends in the stock/crypto market)
 3. A moving average "cloud" visual (Helps identify continuation of up or down trends)
+4. Support and Resistance lines based on fractal theory.
 
 
-Below you can see the indicator applied to a Weekly-chart of Ethereum. The ideal goal is to buy long when there is a buy signal indicated by 'B' and sell indicated by 'S':
+Below you can see the indicator applied to a Weekly-chart of Ethereum. The ideal goal is to buy long when there is a buy signal indicated by 'B' + price being near a support line (lower line) and sell indicated by 'S' + near a resistance line (upper line) :
 
 ![TradingView ScreenShot](https://github.com/user-attachments/assets/9a9048f0-55b3-4697-9903-1aba837b1edc)
