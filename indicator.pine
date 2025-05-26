@@ -1,0 +1,70 @@
+indicator('Brians Prototype', overlay=true)
+
+// ————— Trend Settings
+ilong = input(14, title='Period', group='KDJ')
+isig  = input(3, title='Signal', group='KDJ')
+
+bcwsma(s, l, m) =>
+    _s = s
+    _l = l
+    _m = m
+    _bcwsma = 0.0
+    _bcwsma := (_m * _s + (_l - _m) * nz(_bcwsma[1])) / _l
+    _bcwsma
+
+c = close
+h = ta.highest(high, ilong)
+l = ta.lowest(low, ilong)
+RSV = 100 * ((c - l) / (h - l))
+pK = bcwsma(RSV, isig, 1)
+pD = bcwsma(pK, isig, 1)
+pJ = 3 * pK - 2 * pD
+
+long = ta.crossover (pJ, pD)
+short= ta.crossunder(pJ, pD) 
+
+// Position Management Tools
+pos = 0.0
+pos:= long? 1 : short? -1 : pos[1]
+
+longCond  = long  and (pos[1]!= 1 or na(pos[1]))
+shortCond = short and (pos[1]!=-1 or na(pos[1]))
+
+
+// Chart Plot & Alerts
+plotshape(longCond,  textcolor=#ffffff, color=color.lime, style=shape.labelup , title="Buy" , text="B" , location=location.belowbar,  offset=0, size=size.small)
+plotshape(shortCond, textcolor=#ffffff, color=color.red, style=shape.labeldown, title="Sell", text="S", location=location.abovebar,  offset=0, size=size.small)
+alertcondition(longCond , title="BUY Alert" )
+alertcondition(shortCond, title="SELL Alert")
+
+barcolor(pos==1?color.green:pos==-1?color.red:na, title="Trend Bars")
+
+// ————— Trend Ribbon
+lenF = input.int(5, minval=1, title="Fast Length", group='Trend Ribbon')
+lenS = input.int(8, minval=1, title="Slow Length ", group='Trend Ribbon')
+useHA = input.bool(true, "Use Heiken Ashi", group='Trend Ribbon')
+
+OPEN = open
+CLOSE = useHA ? (open + close + high + low) / 4 : close
+
+outf = ta.sma(CLOSE, lenF)
+outs = ta.sma(CLOSE, lenS)
+
+a = plot(outf, color=na, title="Fast MA")
+b = plot(outs, color=na, title="Slow MA")
+
+col = outf < outs ? color.new(color.red, 70) : color.new(color.green, 70)
+fill(a, b, col, "Trend Ribbon")
+
+// ————— Support and Resistance
+left  = input(5, title="S/R Length Left", group="Support and Resistance")
+right = input(5, title="S/R Length Right", group="Support and Resistance")
+
+hih = ta.pivothigh(high, left, right)
+lol = ta.pivotlow(low, left, right)
+
+top = ta.valuewhen(hih, high[right], 0)
+bot = ta.valuewhen(lol, low[right], 0)
+
+res = plot(top, color=top != top[1] ? na : color.lime, offset=-left)
+sup = plot(bot, color=bot != bot[1] ? na : color.red,  offset=-left)
